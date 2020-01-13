@@ -30,25 +30,6 @@ data.set_index('year', inplace=True)
 
 
 ```python
-# __SOLUTION__ 
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
-
-data = pd.read_csv('winning_400m.csv')
-data['year'] = pd.to_datetime(data['year'].astype(str))
-data.set_index('year', inplace=True)
-```
-
-
-```python
-# Preview the dataset
-data
-```
-
-
-```python
-# __SOLUTION__ 
 # Preview the dataset
 data
 ```
@@ -181,33 +162,19 @@ Plot this time series data.
 
 ```python
 # Plot the time series
-```
-
-
-```python
-# __SOLUTION__ 
-# Plot the time series
 data.plot(figsize=(12,6), linewidth=2, fontsize=12)
 plt.xlabel('Year', fontsize=20)
 plt.ylabel('Winning times (in seconds)', fontsize=12);
 ```
 
 
-![png](index_files/index_7_0.png)
+![png](index_files/index_4_0.png)
 
 
 If you plotted the time series correctly, you should notice that it is not stationary. So, difference the data to get a stationary time series. Make sure to remove the missing values.
 
 
 ```python
-# Difference the time series
-data_diff = None
-data_diff
-```
-
-
-```python
-# __SOLUTION__ 
 # Difference the time series
 data_diff = data.diff().dropna()
 data_diff
@@ -337,31 +304,17 @@ Use `statsmodels` to plot the ACF and PACF of this differenced time series.
 
 ```python
 # Plot the ACF
-
-```
-
-
-```python
-# __SOLUTION__ 
-# Plot the ACF
 from statsmodels.graphics.tsaplots import plot_acf
 fig, ax = plt.subplots(figsize=(8,3))
 plot_acf(data_diff,ax=ax, lags=8);
 ```
 
 
-![png](index_files/index_13_0.png)
+![png](index_files/index_8_0.png)
 
 
 
 ```python
-# Plot the PACF
-
-```
-
-
-```python
-# __SOLUTION__ 
 # Plot the PACF
 from statsmodels.graphics.tsaplots import plot_pacf
 fig, ax = plt.subplots(figsize=(8,3))
@@ -369,19 +322,13 @@ plot_pacf(data_diff,ax=ax, lags=8);
 ```
 
 
-![png](index_files/index_15_0.png)
+![png](index_files/index_9_0.png)
 
 
 Based on the ACF and PACF, fit an ARMA model with the right orders for AR and MA. Feel free to try different models and compare AIC and BIC values, as well as significance values for the parameter estimates. 
 
 
 ```python
-
-```
-
-
-```python
-# __SOLUTION__ 
 # Import ARMA
 from statsmodels.tsa.arima_model import ARMA
 
@@ -421,12 +368,6 @@ print(res_arma.summary())
 
 
 ```python
-
-```
-
-
-```python
-# __SOLUTION__ 
 # Fit an ARMA(2,1) model
 mod_arma = ARMA(data_diff, order=(2,1))
 res_arma = mod_arma.fit()
@@ -467,12 +408,6 @@ print(res_arma.summary())
 
 
 ```python
-
-```
-
-
-```python
-# __SOLUTION__ 
 # Fit an ARMA(2,2) model
 mod_arma = ARMA(data_diff, order=(2,2))
 res_arma = mod_arma.fit()
@@ -517,12 +452,6 @@ print(res_arma.summary())
 
 
 ```python
-# Your comments here
-```
-
-
-```python
-# __SOLUTION__ 
 
 """
 ARMA(1,0), ARMA(2,2) and ARMA(2,1) all seem to have decent fits with significant parameters. 
