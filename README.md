@@ -1,31 +1,21 @@
 
-# ARMA Models in `statsmodels`
+# ARMA Models in `statsmodels` - Lab 
 
 ## Introduction
 
-In this lesson, you'll use your knowledge of the autoregressive (AR) and moving average (MA) models, along with the `statsmodels` library to model time series data. 
+In this lesson, you'll fit an ARMA model using `statsmodels` to a real-world dataset. 
+
 
 ## Objectives
 
-You will be able to:
+In this lab you will: 
 
-- Fit an AR model using `statsmodels` 
-- Fit an MA model using `statsmodels` 
+- Decide the optimal parameters for an ARMA model by plotting ACF and PACF and interpreting them 
+- Fit an ARMA model using statsmodels 
 
-## Generate a first order AR model 
+## Dataset
 
-Recall that the AR model has the following formula:
-
-$$Y_t = \mu + \phi * Y_{t-1}+\epsilon_t$$
-
-This means that:
-
-$$Y_1 = \mu + \phi * Y_{0}+\epsilon_1$$
-$$Y_2 = \mu + \phi * (\text{mean-centered version of } Y_1) +\epsilon_2$$
-
-and so on. 
-
-Let's assume a mean-zero white noise with a standard deviation of 2. We'll also create a daily datetime index ranging from January 2017 until the end of March 2018.
+Run the cell below to import the dataset containing the historical running times for the men's 400m in the Olympic games.
 
 
 ```python
@@ -33,209 +23,370 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-np.random.seed(11225)
-
-# Create a series with the specified dates
-dates = pd.date_range('2017-01-01', '2018-03-31')
-```
-
-We will generate a first order AR model with $\phi = 0.7$ , $\mu=5$ , and $Y_0= 8$. 
-
-
-```python
-error = np.random.normal(0, 2, len(dates))
-Y_0 = 8
-mu = 5
-phi = 0.7
+data = pd.read_csv('winning_400m.csv')
+data['year'] = pd.to_datetime(data['year'].astype(str))
+data.set_index('year', inplace=True)
 ```
 
 
 ```python
-TS = [None] * len(dates)
-y = Y_0
-for i, row in enumerate(dates):
-    TS[i] = mu + y * phi + error[i]
-    y = TS[i] - mu
-```
+# __SOLUTION__ 
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
-Let's plot the time series to verify: 
-
-
-```python
-series = pd.Series(TS, index=dates)
-
-series.plot(figsize=(14,6), linewidth=2, fontsize=14);
+data = pd.read_csv('winning_400m.csv')
+data['year'] = pd.to_datetime(data['year'].astype(str))
+data.set_index('year', inplace=True)
 ```
 
 
-![png](index_files/index_8_0.png)
-
-
-## Look at the ACF and PACF of the model
-
-Although we can use `pandas` to plot the ACF, we highly recommended that you use the `statsmodels` variant instead. 
+```python
+# Preview the dataset
+data
+```
 
 
 ```python
-from statsmodels.graphics.tsaplots import plot_pacf
+# __SOLUTION__ 
+# Preview the dataset
+data
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>winning_times</th>
+    </tr>
+    <tr>
+      <th>year</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1900-01-01</th>
+      <td>49.4</td>
+    </tr>
+    <tr>
+      <th>1904-01-01</th>
+      <td>49.2</td>
+    </tr>
+    <tr>
+      <th>1908-01-01</th>
+      <td>50.0</td>
+    </tr>
+    <tr>
+      <th>1912-01-01</th>
+      <td>48.2</td>
+    </tr>
+    <tr>
+      <th>1920-01-01</th>
+      <td>49.6</td>
+    </tr>
+    <tr>
+      <th>1924-01-01</th>
+      <td>47.6</td>
+    </tr>
+    <tr>
+      <th>1928-01-01</th>
+      <td>47.8</td>
+    </tr>
+    <tr>
+      <th>1932-01-01</th>
+      <td>46.2</td>
+    </tr>
+    <tr>
+      <th>1936-01-01</th>
+      <td>46.5</td>
+    </tr>
+    <tr>
+      <th>1948-01-01</th>
+      <td>46.2</td>
+    </tr>
+    <tr>
+      <th>1952-01-01</th>
+      <td>45.9</td>
+    </tr>
+    <tr>
+      <th>1956-01-01</th>
+      <td>46.7</td>
+    </tr>
+    <tr>
+      <th>1960-01-01</th>
+      <td>44.9</td>
+    </tr>
+    <tr>
+      <th>1964-01-01</th>
+      <td>45.1</td>
+    </tr>
+    <tr>
+      <th>1968-01-01</th>
+      <td>43.8</td>
+    </tr>
+    <tr>
+      <th>1972-01-01</th>
+      <td>44.7</td>
+    </tr>
+    <tr>
+      <th>1976-01-01</th>
+      <td>44.3</td>
+    </tr>
+    <tr>
+      <th>1980-01-01</th>
+      <td>44.6</td>
+    </tr>
+    <tr>
+      <th>1984-01-01</th>
+      <td>44.3</td>
+    </tr>
+    <tr>
+      <th>1988-01-01</th>
+      <td>43.9</td>
+    </tr>
+    <tr>
+      <th>1992-01-01</th>
+      <td>43.5</td>
+    </tr>
+    <tr>
+      <th>1996-01-01</th>
+      <td>43.5</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Plot this time series data. 
+
+
+```python
+# Plot the time series
+```
+
+
+```python
+# __SOLUTION__ 
+# Plot the time series
+data.plot(figsize=(12,6), linewidth=2, fontsize=12)
+plt.xlabel('Year', fontsize=20)
+plt.ylabel('Winning times (in seconds)', fontsize=12);
+```
+
+
+![png](index_files/index_7_0.png)
+
+
+If you plotted the time series correctly, you should notice that it is not stationary. So, difference the data to get a stationary time series. Make sure to remove the missing values.
+
+
+```python
+# Difference the time series
+data_diff = None
+data_diff
+```
+
+
+```python
+# __SOLUTION__ 
+# Difference the time series
+data_diff = data.diff().dropna()
+data_diff
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>winning_times</th>
+    </tr>
+    <tr>
+      <th>year</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1904-01-01</th>
+      <td>-0.2</td>
+    </tr>
+    <tr>
+      <th>1908-01-01</th>
+      <td>0.8</td>
+    </tr>
+    <tr>
+      <th>1912-01-01</th>
+      <td>-1.8</td>
+    </tr>
+    <tr>
+      <th>1920-01-01</th>
+      <td>1.4</td>
+    </tr>
+    <tr>
+      <th>1924-01-01</th>
+      <td>-2.0</td>
+    </tr>
+    <tr>
+      <th>1928-01-01</th>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>1932-01-01</th>
+      <td>-1.6</td>
+    </tr>
+    <tr>
+      <th>1936-01-01</th>
+      <td>0.3</td>
+    </tr>
+    <tr>
+      <th>1948-01-01</th>
+      <td>-0.3</td>
+    </tr>
+    <tr>
+      <th>1952-01-01</th>
+      <td>-0.3</td>
+    </tr>
+    <tr>
+      <th>1956-01-01</th>
+      <td>0.8</td>
+    </tr>
+    <tr>
+      <th>1960-01-01</th>
+      <td>-1.8</td>
+    </tr>
+    <tr>
+      <th>1964-01-01</th>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>1968-01-01</th>
+      <td>-1.3</td>
+    </tr>
+    <tr>
+      <th>1972-01-01</th>
+      <td>0.9</td>
+    </tr>
+    <tr>
+      <th>1976-01-01</th>
+      <td>-0.4</td>
+    </tr>
+    <tr>
+      <th>1980-01-01</th>
+      <td>0.3</td>
+    </tr>
+    <tr>
+      <th>1984-01-01</th>
+      <td>-0.3</td>
+    </tr>
+    <tr>
+      <th>1988-01-01</th>
+      <td>-0.4</td>
+    </tr>
+    <tr>
+      <th>1992-01-01</th>
+      <td>-0.4</td>
+    </tr>
+    <tr>
+      <th>1996-01-01</th>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Use `statsmodels` to plot the ACF and PACF of this differenced time series. 
+
+
+```python
+# Plot the ACF
+
+```
+
+
+```python
+# __SOLUTION__ 
+# Plot the ACF
 from statsmodels.graphics.tsaplots import plot_acf
-
-fig, ax = plt.subplots(figsize=(16,3))
-plot_acf(series, ax=ax, lags=40);
-
-fig, ax = plt.subplots(figsize=(16,3))
-plot_pacf(series, ax=ax, lags=40);
+fig, ax = plt.subplots(figsize=(8,3))
+plot_acf(data_diff,ax=ax, lags=8);
 ```
 
 
-![png](index_files/index_11_0.png)
+![png](index_files/index_13_0.png)
 
-
-
-![png](index_files/index_11_1.png)
-
-
-## Check the model with ARMA in `statsmodels`
-
-`statsmodels` also has a tool that fits ARMA models to time series. The only thing we have to do is provide the number of orders for AR and MA. Have a look at the code below, and the output of the code. 
-
-The `ARMA()` function requires two arguments: the first is the time series to which the model is fit, and the second is the `order` in the form `(p,q)` -- where `p` refers to the order of AR and `q` refers to the order of MA. For example, a first order AR model would be represented as `(1,0)`.  
 
 
 ```python
+# Plot the PACF
+
+```
+
+
+```python
+# __SOLUTION__ 
+# Plot the PACF
+from statsmodels.graphics.tsaplots import plot_pacf
+fig, ax = plt.subplots(figsize=(8,3))
+plot_pacf(data_diff,ax=ax, lags=8);
+```
+
+
+![png](index_files/index_15_0.png)
+
+
+Based on the ACF and PACF, fit an ARMA model with the right orders for AR and MA. Feel free to try different models and compare AIC and BIC values, as well as significance values for the parameter estimates. 
+
+
+```python
+
+```
+
+
+```python
+# __SOLUTION__ 
 # Import ARMA
 from statsmodels.tsa.arima_model import ARMA
-import statsmodels.api as sm
 
-# Instantiate an AR(1) model to the simulated data
-mod_arma = ARMA(series, order=(1,0))
-```
-
-Once you have instantiated the AR(1) model, you can call the `.fit()` method to the fit the model to the data. 
-
-
-```python
-# Fit the model to data
-res_arma = mod_arma.fit()
-```
-
-Similar to other models, you can then call the `.summary()` method to print the information of the model. 
-
-
-```python
-# Print out summary information on the fit
-print(res_arma.summary())
-```
-
-                                  ARMA Model Results                              
-    ==============================================================================
-    Dep. Variable:                      y   No. Observations:                  455
-    Model:                     ARMA(1, 0)   Log Likelihood                -968.698
-    Method:                       css-mle   S.D. of innovations              2.033
-    Date:                Mon, 13 Jan 2020   AIC                           1943.395
-    Time:                        13:44:07   BIC                           1955.756
-    Sample:                    01-01-2017   HQIC                          1948.265
-                             - 03-31-2018                                         
-    ==============================================================================
-                     coef    std err          z      P>|z|      [0.025      0.975]
-    ------------------------------------------------------------------------------
-    const          4.9664      0.269     18.444      0.000       4.439       5.494
-    ar.L1.y        0.6474      0.036     17.880      0.000       0.576       0.718
-                                        Roots                                    
-    =============================================================================
-                      Real          Imaginary           Modulus         Frequency
-    -----------------------------------------------------------------------------
-    AR.1            1.5446           +0.0000j            1.5446            0.0000
-    -----------------------------------------------------------------------------
-
-
-Make sure that the output for the $\phi$ parameter and $\mu$ is as you'd expect. You can use the `.params` attribute to check these values. 
-
-
-```python
-# Print out the estimate for the constant and for theta
-print(res_arma.params)
-```
-
-    const      4.966376
-    ar.L1.y    0.647429
-    dtype: float64
-
-
-## Generate a first order MA model
-
-
-Recall that the MA model has the following formula:
-
-$$Y_t = \mu +\epsilon_t + \theta * \epsilon_{t-1}$$
-
-This means that:
-
-$$Y_1 = \mu + \epsilon_1+  \theta * \epsilon_{0}$$
-$$Y_2 = \mu + \epsilon_2+  \theta * \epsilon_{1}$$
-
-and so on. 
-
-Assume a mean-zero white noise with a standard deviation of 4. We'll also generate a daily datetime index ranging from April 2015 until the end of August 2015. 
-
-We will generate a first order MA model with $\theta = 0.9$ and $\mu=7$ . 
-
-
-```python
-np.random.seed(1234)
-
-# Create a series with the specified dates
-dates = pd.date_range('2015-04-01', '2015-08-31')
-
-error = np.random.normal(0, 4, len(dates))
-mu = 7
-theta = 0.9
-
-TS = [None] * len(dates)
-error_prev = error[0]
-for i, row in enumerate(dates):
-    TS[i] = mu + theta * error_prev + error[i]
-    error_prev = error[i]
-```
-
-
-```python
-series = pd.Series(TS, index=dates)
-
-series.plot(figsize=(14,6), linewidth=2, fontsize=14);
-```
-
-
-![png](index_files/index_23_0.png)
-
-
-## Look at the ACF and PACF of the model
-
-
-```python
-fig, ax = plt.subplots(figsize=(16,3))
-plot_acf(series, ax=ax, lags=40);
-
-fig, ax = plt.subplots(figsize=(16,3))
-plot_pacf(series, ax=ax, lags=40);
-```
-
-
-![png](index_files/index_25_0.png)
-
-
-
-![png](index_files/index_25_1.png)
-
-
-## Check the model with ARMA in `statsmodels`
-
-Let's fit an MA model to verify the parameters are estimated correctly. The first order MA model would be represented as `(0,1)`. 
-
-
-```python
-# Instantiate and fit an MA(1) model to the simulated data
-mod_arma = ARMA(series, order=(0,1))
+# Fit an ARMA(1,0) model
+mod_arma = ARMA(data_diff, order=(1,0))
 res_arma = mod_arma.fit()
 
 # Print out summary information on the fit
@@ -244,37 +395,151 @@ print(res_arma.summary())
 
                                   ARMA Model Results                              
     ==============================================================================
-    Dep. Variable:                      y   No. Observations:                  153
-    Model:                     ARMA(0, 1)   Log Likelihood                -426.378
-    Method:                       css-mle   S.D. of innovations              3.909
-    Date:                Mon, 13 Jan 2020   AIC                            858.757
-    Time:                        13:44:08   BIC                            867.848
-    Sample:                    04-01-2015   HQIC                           862.450
-                             - 08-31-2015                                         
-    ==============================================================================
-                     coef    std err          z      P>|z|      [0.025      0.975]
-    ------------------------------------------------------------------------------
-    const          7.5373      0.590     12.776      0.000       6.381       8.694
-    ma.L1.y        0.8727      0.051     17.165      0.000       0.773       0.972
+    Dep. Variable:          winning_times   No. Observations:                   21
+    Model:                     ARMA(1, 0)   Log Likelihood                 -20.054
+    Method:                       css-mle   S.D. of innovations              0.618
+    Date:                Mon, 13 Jan 2020   AIC                             46.107
+    Time:                        15:00:37   BIC                             49.241
+    Sample:                             0   HQIC                            46.787
+                                                                                  
+    =======================================================================================
+                              coef    std err          z      P>|z|      [0.025      0.975]
+    ---------------------------------------------------------------------------------------
+    const                  -0.2885      0.080     -3.602      0.002      -0.445      -0.131
+    ar.L1.winning_times    -0.7186      0.137     -5.262      0.000      -0.986      -0.451
                                         Roots                                    
     =============================================================================
                       Real          Imaginary           Modulus         Frequency
     -----------------------------------------------------------------------------
-    MA.1           -1.1459           +0.0000j            1.1459            0.5000
+    AR.1           -1.3916           +0.0000j            1.3916            0.5000
     -----------------------------------------------------------------------------
+
+
+    //anaconda3/lib/python3.7/site-packages/statsmodels/tsa/base/tsa_model.py:219: ValueWarning: A date index has been provided, but it has no associated frequency information and so will be ignored when e.g. forecasting.
+      ' ignored when e.g. forecasting.', ValueWarning)
 
 
 
 ```python
-# Print out the estimate for the constant and for theta
-print(res_arma.params)
+
 ```
 
-    const      7.537294
-    ma.L1.y    0.872683
-    dtype: float64
+
+```python
+# __SOLUTION__ 
+# Fit an ARMA(2,1) model
+mod_arma = ARMA(data_diff, order=(2,1))
+res_arma = mod_arma.fit()
+
+# Print out summary information on the fit
+print(res_arma.summary())
+```
+
+                                  ARMA Model Results                              
+    ==============================================================================
+    Dep. Variable:          winning_times   No. Observations:                   21
+    Model:                     ARMA(2, 1)   Log Likelihood                 -18.955
+    Method:                       css-mle   S.D. of innovations              0.562
+    Date:                Mon, 13 Jan 2020   AIC                             47.911
+    Time:                        15:00:45   BIC                             53.133
+    Sample:                             0   HQIC                            49.044
+                                                                                  
+    =======================================================================================
+                              coef    std err          z      P>|z|      [0.025      0.975]
+    ---------------------------------------------------------------------------------------
+    const                  -0.2916      0.073     -4.018      0.001      -0.434      -0.149
+    ar.L1.winning_times    -1.6827      0.119    -14.199      0.000      -1.915      -1.450
+    ar.L2.winning_times    -0.7714      0.128     -6.022      0.000      -1.022      -0.520
+    ma.L1.winning_times     0.9999      0.132      7.550      0.000       0.740       1.259
+                                        Roots                                    
+    =============================================================================
+                      Real          Imaginary           Modulus         Frequency
+    -----------------------------------------------------------------------------
+    AR.1           -1.0907           -0.3268j            1.1386           -0.4537
+    AR.2           -1.0907           +0.3268j            1.1386            0.4537
+    MA.1           -1.0001           +0.0000j            1.0001            0.5000
+    -----------------------------------------------------------------------------
 
 
-## Summary
+    //anaconda3/lib/python3.7/site-packages/statsmodels/tsa/base/tsa_model.py:219: ValueWarning: A date index has been provided, but it has no associated frequency information and so will be ignored when e.g. forecasting.
+      ' ignored when e.g. forecasting.', ValueWarning)
 
-Great job! In this lesson, you saw how you can use the AR and MA models using the `ARMA()` function from `statsmodels` by specifying the order in the form of `(p,q)`, where at least one of `p` or `q` was zero depending on the kind of model fit. You can use `ARMA()` to fit a combined ARMA model as well -- which you will do in the next lab! 
+
+
+```python
+
+```
+
+
+```python
+# __SOLUTION__ 
+# Fit an ARMA(2,2) model
+mod_arma = ARMA(data_diff, order=(2,2))
+res_arma = mod_arma.fit()
+
+# Print out summary information on the fit
+print(res_arma.summary())
+```
+
+                                  ARMA Model Results                              
+    ==============================================================================
+    Dep. Variable:          winning_times   No. Observations:                   21
+    Model:                     ARMA(2, 2)   Log Likelihood                 -16.472
+    Method:                       css-mle   S.D. of innovations              0.461
+    Date:                Mon, 13 Jan 2020   AIC                             44.943
+    Time:                        15:00:53   BIC                             51.210
+    Sample:                             0   HQIC                            46.303
+                                                                                  
+    =======================================================================================
+                              coef    std err          z      P>|z|      [0.025      0.975]
+    ---------------------------------------------------------------------------------------
+    const                  -0.2718      0.098     -2.779      0.013      -0.463      -0.080
+    ar.L1.winning_times    -1.7575      0.097    -18.070      0.000      -1.948      -1.567
+    ar.L2.winning_times    -0.9182      0.092    -10.002      0.000      -1.098      -0.738
+    ma.L1.winning_times     1.5682      0.221      7.083      0.000       1.134       2.002
+    ma.L2.winning_times     1.0000      0.253      3.951      0.001       0.504       1.496
+                                        Roots                                    
+    =============================================================================
+                      Real          Imaginary           Modulus         Frequency
+    -----------------------------------------------------------------------------
+    AR.1           -0.9571           -0.4161j            1.0436           -0.4347
+    AR.2           -0.9571           +0.4161j            1.0436            0.4347
+    MA.1           -0.7841           -0.6206j            1.0000           -0.3934
+    MA.2           -0.7841           +0.6206j            1.0000            0.3934
+    -----------------------------------------------------------------------------
+
+
+    //anaconda3/lib/python3.7/site-packages/statsmodels/tsa/base/tsa_model.py:219: ValueWarning: A date index has been provided, but it has no associated frequency information and so will be ignored when e.g. forecasting.
+      ' ignored when e.g. forecasting.', ValueWarning)
+
+
+## What is your final model? Why did you pick this model?
+
+
+```python
+# Your comments here
+```
+
+
+```python
+# __SOLUTION__ 
+
+"""
+ARMA(1,0), ARMA(2,2) and ARMA(2,1) all seem to have decent fits with significant parameters. 
+Depending on whether you pick AIC or BIC as a model selection criterion, 
+your result may vary. In this situation, you'd generally go for a model with fewer parameters, 
+so ARMA(1,0) seems fine. Note that we have a relatively short time series, 
+which can lead to a more difficult model selection process.
+"""
+```
+
+
+
+
+    "\nARMA(1,0), ARMA(2,2) and ARMA(2,1) all seem to have decent fits with significant parameters. \nDepending on whether you pick AIC or BIC as a model selection criterion, \nyour result may vary. In this situation, you'd generally go for a model with fewer parameters, \nso ARMA(1,0) seems fine. Note that we have a relatively short time series, \nwhich can lead to a more difficult model selection process.\n"
+
+
+
+## Summary 
+
+Well done. In addition to manipulating and visualizing time series data, you now know how to create a stationary time series and fit ARMA models. 
