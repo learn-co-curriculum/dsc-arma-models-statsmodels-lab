@@ -1,5 +1,4 @@
-
-# ARMA Models in `statsmodels` - Lab 
+# ARMA Models in StatsModels - Lab 
 
 ## Introduction
 
@@ -11,7 +10,7 @@ In this lesson, you'll fit an ARMA model using `statsmodels` to a real-world dat
 In this lab you will: 
 
 - Decide the optimal parameters for an ARMA model by plotting ACF and PACF and interpreting them 
-- Fit an ARMA model using statsmodels 
+- Fit an ARMA model using StatsModels 
 
 ## Dataset
 
@@ -22,10 +21,13 @@ Run the cell below to import the dataset containing the historical running times
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
 
 data = pd.read_csv('winning_400m.csv')
 data['year'] = pd.to_datetime(data['year'].astype(str))
 data.set_index('year', inplace=True)
+data.index = data.index.to_period("Y")
 ```
 
 
