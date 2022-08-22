@@ -22,7 +22,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import warnings
-warnings.filterwarnings('ignore')
+from statsmodels.tools.sm_exceptions import ConvergenceWarning
+warnings.simplefilter('ignore', ConvergenceWarning)
 
 data = pd.read_csv('winning_400m.csv')
 data['year'] = pd.to_datetime(data['year'].astype(str))
@@ -337,111 +338,118 @@ Based on the ACF and PACF, fit an ARMA model with the right orders for AR and MA
 
 
 ```python
-# Import ARMA
-from statsmodels.tsa.arima_model import ARMA
+# Import ARIMA
+from statsmodels.tsa.arima.model import ARIMA
 
 # Fit an ARMA(1,0) model
-mod_arma = ARMA(data_diff, order=(1,0))
+mod_arma = ARIMA(data_diff, order=(1,0,0))
 res_arma = mod_arma.fit()
 
 # Print out summary information on the fit
 print(res_arma.summary())
 ```
 
-                                  ARMA Model Results                              
+                                   SARIMAX Results                                
     ==============================================================================
     Dep. Variable:          winning_times   No. Observations:                   21
-    Model:                     ARMA(1, 0)   Log Likelihood                 -20.054
-    Method:                       css-mle   S.D. of innovations              0.618
-    Date:                Tue, 26 Jul 2022   AIC                             46.107
-    Time:                        17:39:52   BIC                             49.241
+    Model:                 ARIMA(1, 0, 0)   Log Likelihood                 -20.054
+    Date:                Mon, 22 Aug 2022   AIC                             46.107
+    Time:                        17:08:26   BIC                             49.241
     Sample:                    12-31-1904   HQIC                            46.787
                              - 12-31-1996                                         
-    =======================================================================================
-                              coef    std err          z      P>|z|      [0.025      0.975]
-    ---------------------------------------------------------------------------------------
-    const                  -0.2885      0.080     -3.602      0.000      -0.445      -0.131
-    ar.L1.winning_times    -0.7186      0.137     -5.262      0.000      -0.986      -0.451
-                                        Roots                                    
-    =============================================================================
-                      Real          Imaginary           Modulus         Frequency
-    -----------------------------------------------------------------------------
-    AR.1           -1.3916           +0.0000j            1.3916            0.5000
-    -----------------------------------------------------------------------------
+    Covariance Type:                  opg                                         
+    ==============================================================================
+                     coef    std err          z      P>|z|      [0.025      0.975]
+    ------------------------------------------------------------------------------
+    const         -0.2885      0.081     -3.559      0.000      -0.447      -0.130
+    ar.L1         -0.7186      0.144     -5.005      0.000      -1.000      -0.437
+    sigma2         0.3819      0.180      2.121      0.034       0.029       0.735
+    ===================================================================================
+    Ljung-Box (L1) (Q):                   0.04   Jarque-Bera (JB):                 1.19
+    Prob(Q):                              0.84   Prob(JB):                         0.55
+    Heteroskedasticity (H):               0.33   Skew:                             0.20
+    Prob(H) (two-sided):                  0.16   Kurtosis:                         1.91
+    ===================================================================================
+    
+    Warnings:
+    [1] Covariance matrix calculated using the outer product of gradients (complex-step).
 
 
 
 ```python
 # Fit an ARMA(2,1) model
-mod_arma = ARMA(data_diff, order=(2,1))
+mod_arma = ARIMA(data_diff, order=(2,0,1))
 res_arma = mod_arma.fit()
 
 # Print out summary information on the fit
 print(res_arma.summary())
 ```
 
-                                  ARMA Model Results                              
+                                   SARIMAX Results                                
     ==============================================================================
     Dep. Variable:          winning_times   No. Observations:                   21
-    Model:                     ARMA(2, 1)   Log Likelihood                 -18.955
-    Method:                       css-mle   S.D. of innovations              0.562
-    Date:                Tue, 26 Jul 2022   AIC                             47.911
-    Time:                        17:39:55   BIC                             53.133
-    Sample:                    12-31-1904   HQIC                            49.044
+    Model:                 ARIMA(2, 0, 1)   Log Likelihood                 -19.931
+    Date:                Mon, 22 Aug 2022   AIC                             49.862
+    Time:                        17:08:27   BIC                             55.084
+    Sample:                    12-31-1904   HQIC                            50.995
                              - 12-31-1996                                         
-    =======================================================================================
-                              coef    std err          z      P>|z|      [0.025      0.975]
-    ---------------------------------------------------------------------------------------
-    const                  -0.2916      0.073     -4.018      0.000      -0.434      -0.149
-    ar.L1.winning_times    -1.6827      0.119    -14.199      0.000      -1.915      -1.450
-    ar.L2.winning_times    -0.7714      0.128     -6.022      0.000      -1.022      -0.520
-    ma.L1.winning_times     0.9999      0.132      7.550      0.000       0.740       1.259
-                                        Roots                                    
-    =============================================================================
-                      Real          Imaginary           Modulus         Frequency
-    -----------------------------------------------------------------------------
-    AR.1           -1.0907           -0.3268j            1.1386           -0.4537
-    AR.2           -1.0907           +0.3268j            1.1386            0.4537
-    MA.1           -1.0001           +0.0000j            1.0001            0.5000
-    -----------------------------------------------------------------------------
+    Covariance Type:                  opg                                         
+    ==============================================================================
+                     coef    std err          z      P>|z|      [0.025      0.975]
+    ------------------------------------------------------------------------------
+    const         -0.2834      0.092     -3.079      0.002      -0.464      -0.103
+    ar.L1         -0.6102      2.583     -0.236      0.813      -5.673       4.453
+    ar.L2          0.1280      1.848      0.069      0.945      -3.493       3.749
+    ma.L1         -0.0208      2.564     -0.008      0.994      -5.046       5.004
+    sigma2         0.3774      0.181      2.088      0.037       0.023       0.732
+    ===================================================================================
+    Ljung-Box (L1) (Q):                   0.04   Jarque-Bera (JB):                 1.21
+    Prob(Q):                              0.83   Prob(JB):                         0.55
+    Heteroskedasticity (H):               0.31   Skew:                             0.22
+    Prob(H) (two-sided):                  0.14   Kurtosis:                         1.91
+    ===================================================================================
+    
+    Warnings:
+    [1] Covariance matrix calculated using the outer product of gradients (complex-step).
 
 
 
 ```python
 # Fit an ARMA(2,2) model
-mod_arma = ARMA(data_diff, order=(2,2))
+mod_arma = ARIMA(data_diff, order=(2,0,2))
 res_arma = mod_arma.fit()
 
 # Print out summary information on the fit
 print(res_arma.summary())
 ```
 
-                                  ARMA Model Results                              
+                                   SARIMAX Results                                
     ==============================================================================
     Dep. Variable:          winning_times   No. Observations:                   21
-    Model:                     ARMA(2, 2)   Log Likelihood                 -16.472
-    Method:                       css-mle   S.D. of innovations              0.461
-    Date:                Tue, 26 Jul 2022   AIC                             44.943
-    Time:                        17:39:58   BIC                             51.210
+    Model:                 ARIMA(2, 0, 2)   Log Likelihood                 -16.472
+    Date:                Mon, 22 Aug 2022   AIC                             44.943
+    Time:                        17:08:29   BIC                             51.210
     Sample:                    12-31-1904   HQIC                            46.303
                              - 12-31-1996                                         
-    =======================================================================================
-                              coef    std err          z      P>|z|      [0.025      0.975]
-    ---------------------------------------------------------------------------------------
-    const                  -0.2718      0.098     -2.779      0.005      -0.463      -0.080
-    ar.L1.winning_times    -1.7575      0.097    -18.070      0.000      -1.948      -1.567
-    ar.L2.winning_times    -0.9182      0.092    -10.002      0.000      -1.098      -0.738
-    ma.L1.winning_times     1.5682      0.221      7.083      0.000       1.134       2.002
-    ma.L2.winning_times     1.0000      0.253      3.951      0.000       0.504       1.496
-                                        Roots                                    
-    =============================================================================
-                      Real          Imaginary           Modulus         Frequency
-    -----------------------------------------------------------------------------
-    AR.1           -0.9571           -0.4161j            1.0436           -0.4347
-    AR.2           -0.9571           +0.4161j            1.0436            0.4347
-    MA.1           -0.7841           -0.6206j            1.0000           -0.3934
-    MA.2           -0.7841           +0.6206j            1.0000            0.3934
-    -----------------------------------------------------------------------------
+    Covariance Type:                  opg                                         
+    ==============================================================================
+                     coef    std err          z      P>|z|      [0.025      0.975]
+    ------------------------------------------------------------------------------
+    const         -0.2717      0.103     -2.629      0.009      -0.474      -0.069
+    ar.L1         -1.7573      0.117    -14.990      0.000      -1.987      -1.528
+    ar.L2         -0.9179      0.120     -7.664      0.000      -1.153      -0.683
+    ma.L1          1.5669     50.157      0.031      0.975     -96.739      99.873
+    ma.L2          0.9986     63.913      0.016      0.988    -124.268     126.265
+    sigma2         0.2126     13.545      0.016      0.987     -26.336      26.761
+    ===================================================================================
+    Ljung-Box (L1) (Q):                   0.03   Jarque-Bera (JB):                 0.87
+    Prob(Q):                              0.86   Prob(JB):                         0.65
+    Heteroskedasticity (H):               0.41   Skew:                            -0.30
+    Prob(H) (two-sided):                  0.26   Kurtosis:                         2.20
+    ===================================================================================
+    
+    Warnings:
+    [1] Covariance matrix calculated using the outer product of gradients (complex-step).
 
 
 ## What is your final model? Why did you pick this model?
