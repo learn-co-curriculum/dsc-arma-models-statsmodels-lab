@@ -22,7 +22,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import warnings
-warnings.filterwarnings('ignore')
+from statsmodels.tools.sm_exceptions import ConvergenceWarning
+warnings.simplefilter('ignore', ConvergenceWarning)
 
 data = pd.read_csv('winning_400m.csv')
 data['year'] = pd.to_datetime(data['year'].astype(str))
