@@ -376,7 +376,7 @@ plot_acf(data_diff,ax=ax, lags=8);
 # Plot the PACF
 from statsmodels.graphics.tsaplots import plot_pacf
 fig, ax = plt.subplots(figsize=(8,3))
-plot_pacf(data_diff,ax=ax, lags=8);
+plot_pacf(data_diff,ax=ax, lags=8, method='ywm');
 ```
 
 
@@ -410,8 +410,8 @@ print(res_arma.summary())
     ==============================================================================
     Dep. Variable:          winning_times   No. Observations:                   21
     Model:                 ARIMA(1, 0, 0)   Log Likelihood                 -20.054
-    Date:                Mon, 22 Aug 2022   AIC                             46.107
-    Time:                        17:08:26   BIC                             49.241
+    Date:                Fri, 03 Mar 2023   AIC                             46.107
+    Time:                        12:34:30   BIC                             49.241
     Sample:                    12-31-1904   HQIC                            46.787
                              - 12-31-1996                                         
     Covariance Type:                  opg                                         
@@ -452,8 +452,8 @@ print(res_arma.summary())
     ==============================================================================
     Dep. Variable:          winning_times   No. Observations:                   21
     Model:                 ARIMA(2, 0, 1)   Log Likelihood                 -19.931
-    Date:                Mon, 22 Aug 2022   AIC                             49.862
-    Time:                        17:08:27   BIC                             55.084
+    Date:                Fri, 03 Mar 2023   AIC                             49.862
+    Time:                        12:34:31   BIC                             55.084
     Sample:                    12-31-1904   HQIC                            50.995
                              - 12-31-1996                                         
     Covariance Type:                  opg                                         
@@ -496,20 +496,20 @@ print(res_arma.summary())
     ==============================================================================
     Dep. Variable:          winning_times   No. Observations:                   21
     Model:                 ARIMA(2, 0, 2)   Log Likelihood                 -16.472
-    Date:                Mon, 22 Aug 2022   AIC                             44.943
-    Time:                        17:08:29   BIC                             51.210
+    Date:                Fri, 03 Mar 2023   AIC                             44.943
+    Time:                        12:34:35   BIC                             51.210
     Sample:                    12-31-1904   HQIC                            46.303
                              - 12-31-1996                                         
     Covariance Type:                  opg                                         
     ==============================================================================
                      coef    std err          z      P>|z|      [0.025      0.975]
     ------------------------------------------------------------------------------
-    const         -0.2717      0.103     -2.629      0.009      -0.474      -0.069
-    ar.L1         -1.7573      0.117    -14.990      0.000      -1.987      -1.528
-    ar.L2         -0.9179      0.120     -7.664      0.000      -1.153      -0.683
-    ma.L1          1.5669     50.157      0.031      0.975     -96.739      99.873
-    ma.L2          0.9986     63.913      0.016      0.988    -124.268     126.265
-    sigma2         0.2126     13.545      0.016      0.987     -26.336      26.761
+    const         -0.2718      0.103     -2.630      0.009      -0.474      -0.069
+    ar.L1         -1.7573      0.117    -14.997      0.000      -1.987      -1.528
+    ar.L2         -0.9180      0.120     -7.667      0.000      -1.153      -0.683
+    ma.L1          1.5669     47.062      0.033      0.973     -90.673      93.807
+    ma.L2          0.9985     59.964      0.017      0.987    -116.529     118.526
+    sigma2         0.2126     12.706      0.017      0.987     -24.691      25.116
     ===================================================================================
     Ljung-Box (L1) (Q):                   0.03   Jarque-Bera (JB):                 0.87
     Prob(Q):                              0.86   Prob(JB):                         0.65
@@ -540,6 +540,13 @@ so ARMA(1,0) seems fine. Note that we have a relatively short time series,
 which can lead to a more difficult model selection process.
 """
 ```
+
+
+
+
+    "\nARMA(1,0), ARMA(2,2) and ARMA(2,1) all seem to have decent fits with significant parameters. \nDepending on whether you pick AIC or BIC as a model selection criterion, \nyour result may vary. In this situation, you'd generally go for a model with fewer parameters, \nso ARMA(1,0) seems fine. Note that we have a relatively short time series, \nwhich can lead to a more difficult model selection process.\n"
+
+
 
 ## Summary 
 
