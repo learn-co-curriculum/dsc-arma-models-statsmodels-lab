@@ -23,11 +23,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import warnings
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
-warnings.simplefilter('ignore', ConvergenceWarning)
 
-data = pd.read_csv('winning_400m.csv')
-data['year'] = pd.to_datetime(data['year'].astype(str))
-data.set_index('year', inplace=True)
+warnings.simplefilter("ignore", ConvergenceWarning)
+
+data = pd.read_csv("winning_400m.csv")
+data["year"] = pd.to_datetime(data["year"].astype(str))
+data.set_index("year", inplace=True)
 data.index = data.index.to_period("Y")
 ```
 
@@ -58,13 +59,11 @@ Use `statsmodels` to plot the ACF and PACF of this differenced time series.
 
 ```python
 # Plot the ACF
-
 ```
 
 
 ```python
 # Plot the PACF
-
 ```
 
 Based on the ACF and PACF, fit an ARMA model with the right orders for AR and MA. Feel free to try different models and compare AIC and BIC values, as well as significance values for the parameter estimates. 
