@@ -23,11 +23,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import warnings
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
-warnings.simplefilter('ignore', ConvergenceWarning)
 
-data = pd.read_csv('winning_400m.csv')
-data['year'] = pd.to_datetime(data['year'].astype(str))
-data.set_index('year', inplace=True)
+warnings.simplefilter("ignore", ConvergenceWarning)
+
+data = pd.read_csv("winning_400m.csv")
+data["year"] = pd.to_datetime(data["year"].astype(str))
+data.set_index("year", inplace=True)
 data.index = data.index.to_period("Y")
 ```
 
@@ -165,9 +166,9 @@ Plot this time series data.
 
 ```python
 # Plot the time series
-data.plot(figsize=(12,6), linewidth=2, fontsize=12)
-plt.xlabel('Year', fontsize=20)
-plt.ylabel('Winning times (in seconds)', fontsize=12);
+data.plot(figsize=(12, 6), linewidth=2, fontsize=12)
+plt.xlabel("Year", fontsize=20)
+plt.ylabel("Winning times (in seconds)", fontsize=12);
 ```
 
 
@@ -310,8 +311,9 @@ Use `statsmodels` to plot the ACF and PACF of this differenced time series.
 ```python
 # Plot the ACF
 from statsmodels.graphics.tsaplots import plot_acf
-fig, ax = plt.subplots(figsize=(8,3))
-plot_acf(data_diff,ax=ax, lags=8);
+
+fig, ax = plt.subplots(figsize=(8, 3))
+plot_acf(data_diff, ax=ax, lags=8);
 ```
 
 
@@ -324,8 +326,9 @@ plot_acf(data_diff,ax=ax, lags=8);
 ```python
 # Plot the PACF
 from statsmodels.graphics.tsaplots import plot_pacf
-fig, ax = plt.subplots(figsize=(8,3))
-plot_pacf(data_diff,ax=ax, lags=8, method='ywm');
+
+fig, ax = plt.subplots(figsize=(8, 3))
+plot_pacf(data_diff, ax=ax, lags=8, method="ywm");
 ```
 
 
@@ -342,7 +345,7 @@ Based on the ACF and PACF, fit an ARMA model with the right orders for AR and MA
 from statsmodels.tsa.arima.model import ARIMA
 
 # Fit an ARMA(1,0) model
-mod_arma = ARIMA(data_diff, order=(1,0,0))
+mod_arma = ARIMA(data_diff, order=(1, 0, 0))
 res_arma = mod_arma.fit()
 
 # Print out summary information on the fit
@@ -378,7 +381,7 @@ print(res_arma.summary())
 
 ```python
 # Fit an ARMA(2,1) model
-mod_arma = ARIMA(data_diff, order=(2,0,1))
+mod_arma = ARIMA(data_diff, order=(2, 0, 1))
 res_arma = mod_arma.fit()
 
 # Print out summary information on the fit
@@ -416,7 +419,7 @@ print(res_arma.summary())
 
 ```python
 # Fit an ARMA(2,2) model
-mod_arma = ARIMA(data_diff, order=(2,0,2))
+mod_arma = ARIMA(data_diff, order=(2, 0, 2))
 res_arma = mod_arma.fit()
 
 # Print out summary information on the fit
